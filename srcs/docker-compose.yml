@@ -1,0 +1,72 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/compose-spec/compose-go/master/schema/compose-spec.json
+
+services:
+  mariadb:
+    hostname: mariadb
+    env_file: ../secrets/exemple.env
+    build: requirements/mariadb/
+    secrets:
+      - mariadb_root_password
+      - mariadb_wp_admin_password
+      - mariadb_wp_user_password
+    volumes:
+      - mariadb-vol:/var/lib/mysql
+    networks:
+      - backend
+    restart: always
+  wordpress:
+    env_file: ../secrets/exemple.env
+    build: requirements/wordpress/
+    secrets:
+      - mariadb_root_password
+      - mariadb_wp_admin_password
+      - mariadb_wp_user_password
+    depends_on:
+      - mariadb
+    restart: always
+    volumes:
+      - wordpress-vol:/var/www/
+    networks:
+      - backend
+    hostname: wordpress
+  nginx:
+    build: requirements/nginx/
+    env_file: ../secrets/exemple.env
+    volumes:
+      - wordpress-vol:/var/www/
+    depends_on:
+      - wordpress
+    networks:
+      - backend
+    ports:
+      - 443:443
+    secrets:
+      - ssl_key
+      - ssl_cert
+secrets:
+  ssl_key:
+    file: ../secrets/ssl_key.pem
+  ssl_cert:
+    file: ../secrets/ssl_cert.pem
+  mariadb_root_password:
+    file: ../secrets/root_pass
+  mariadb_wp_admin_password:
+    file: ../secrets/admin_pass
+  mariadb_wp_user_password:
+    file: ../secrets/user_pass
+volumes:
+  wordpress-vol:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${HOME}/data/wordpress
+  mariadb-vol:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${HOME}/data/mariadb
+networks:
+  backend:
+    name: backend

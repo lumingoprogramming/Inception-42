@@ -2,8 +2,9 @@
 
 services:
   mariadb:
+    image: mariadb
     hostname: mariadb
-    env_file: ../secrets/exemple.env
+    env_file: .env
     build: requirements/mariadb/
     secrets:
       - mariadb_root_password
@@ -15,7 +16,8 @@ services:
       - backend
     restart: always
   wordpress:
-    env_file: ../secrets/exemple.env
+    image: wordpress
+    env_file: .env
     build: requirements/wordpress/
     secrets:
       - mariadb_root_password
@@ -30,8 +32,9 @@ services:
       - backend
     hostname: wordpress
   nginx:
+    image: nginx
     build: requirements/nginx/
-    env_file: ../secrets/exemple.env
+    env_file: .env
     volumes:
       - wordpress-vol:/var/www/
     depends_on:

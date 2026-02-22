@@ -15,8 +15,8 @@ key: ${SSL_KEY} ${SSL_CERT} pass
 pass: ${ROOT_PASS} ${ADMIN_PASS} ${USER_PASS}
 
 data:
-	mkdir -p ~/data/mariadb/ 
-	mkdir -p ~/data/wordpress/
+	mkdir -p $(HOME)/data/mariadb/
+	mkdir -p $(HOME)/data/wordpress/
 
 down:
 	docker compose -f srcs/docker-compose.yml down
